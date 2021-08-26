@@ -48,6 +48,8 @@ class UserRegister(Resource):
     
     def post(self):
         request_data = UserRegister.parser.parse_args()
+        if User.find_by_username(request_data['username']):
+            return {"message": "A user with that username already exists"}, 400
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
         query = "INSERT INTO users VALUES (NULL, ?, ?)"
