@@ -10,26 +10,36 @@ from flask_jwt_extended import (
 from models.user import UserModel
 from blacklist import BLACKLIST
 
+BLANK_ERROR = "'{}' cannot be blank!"
+NAME_ALREADY_EXISTS = "An user with name '{}' already exists."
+ERROR_INSERTING = "An error ocurred while inserting the user."
+USER_NOT_FOUND = "User not found."
+USER_DELETED = "User deleted."
+USER_CREATED = "User created succesfully."
+BAD_CREDENTIALS = "Invalid credentials."
+SUCESSFULLY_LOGOUT = "User <id={user_id}> Succesfully logged out."
+
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument('username',
                         type=str,
                         required=True,
-                        help='Username cannot be left blank'
+                        help=BLANK_ERROR.format('username')
                         )
 _user_parser.add_argument('password',
                         type=str,
                         required=True,
-                        help='Password cannot be left blank'
+                        help=BLANK_ERROR.format('password')
                         )
 
 class UserRegister(Resource):
-    def post(self):
+    @classmethod
+    def post(cls):
         request_data = _user_parser.parse_args()
         if UserModel.find_by_username(request_data['username']):
-            return {"message": "A user with that username already exists"}, 400
+            return {"message": NAME_ALREADY_EXISTS.format(request_data['username'])}, 400
         user = UserModel(**request_data)
         user.save_to_db()
-        return {"message": "User created succesfully."}, 201
+        return {"message": USER_CREATED}, 201
 
 
 class User(Resource):
@@ -37,16 +47,16 @@ class User(Resource):
     def get(cls, user_id):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {'message': 'User not found'}, 404
+            return {'message': USER_NOT_FOUND}, 404
         return user.json()
     
     @classmethod
     def delete(cls, user_id):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {'message': 'User not found'}, 404
+            return {'message': USER_NOT_FOUND}, 404
         user.delete_from_db()
-        return {'message': 'User deleted.'}, 200
+        return {'message': USER_DELETED}, 200
 
 
 class UserLogin(Resource):
@@ -61,18 +71,21 @@ class UserLogin(Resource):
                 'access_token': access_token,
                 'refresh_token': refresh_token
             }, 200
-        return {'message': 'Invalid credentials'}, 401
+        return {'message': BAD_CREDENTIALS}, 401
 
 class UserLogout(Resource):
+    @classmethod
     @jwt_required()
-    def post(self):
+    def post(cls):
         jti = get_jwt()['jti']
+        user_id = get_jwt_identity()
         BLACKLIST.add(jti)
-        return {'message': 'Succesfully logged out.'}, 200
+        return {'message': SUCESSFULLY_LOGOUT.format(user_id)}, 200
 
 class TokenRefresh(Resource):
+    @classmethod
     @jwt_required(refresh=True)
-    def post(self):
+    def post(cls):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
         return {'access_token': new_token}, 200
