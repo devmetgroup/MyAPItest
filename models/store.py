@@ -22,4 +22,4 @@ class StoreModel(db.Model):
         db.session.commit()
     
     def json(self):
-        return {'name': self.name, 'items': [item.json() for item in self.items.all()]}
+        return {'id': self.id, 'name': self.name, 'items': [item.json() for item in self.items.all()]}
