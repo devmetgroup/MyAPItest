@@ -27,12 +27,9 @@ class Item(Resource):
     def post(cls, name):
         if ItemModel.find_by_name(name):
             return {'message': NAME_ALREADY_EXISTS.format(name)}, 400
-        try:
-            item_json = request.get_json()
-            item_json["name"] = name
-            item = item_schema.load(item_json)
-        except ValidationError as err:
-            return err.messages, 400
+        item_json = request.get_json()
+        item_json["name"] = name
+        item = item_schema.load(item_json)
         try:
             item.save_to_db()
         except:
@@ -55,11 +52,8 @@ class Item(Resource):
         if item:
             item.price = item_json['price']
         else:
-            try:
-                item_json["name"] = name
-                item = item_schema.load(item_json)
-            except ValidationError as err:
-                return err.messages, 400
+            item_json["name"] = name
+            item = item_schema.load(item_json)
         item.save_to_db()
         return item_schema.dump(item), 200
 
