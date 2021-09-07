@@ -4,6 +4,7 @@ from requests import Response, post
 
 FAILED_LOAD_API_KEY = "Failed to load MailGun API KEY."
 FAILED_LOAD_DOMAIN = "Failed to load MailGun domain."
+FAILED_LOAD_FROM_EMAIL = "Failed to load MailGun mail."
 ERROR_SENDING_EMAIL = "Error in sending confirmation email, user registration failed."
 
 class MailGunException(Exception):
@@ -15,7 +16,7 @@ class Mailgun:
     MAILGUN_DOMAIN = os.environ.get("MAILGUN_DOMAIN")
     MAILGUN_API_KEY = os.environ.get("MAILGUN_API_KEY")
     FROM_TITLE = "Stores REST API"
-    FROM_EMAIL = "postmaster@sandbox10b381335ae845b6be096c3195a384e6.mailgun.org"
+    FROM_EMAIL = os.environ.get("FROM_EMAIL")
     
     @classmethod    
     def send_email(cls, email: List[str], subject: str, text: str, html: str) -> Response:
@@ -23,6 +24,8 @@ class Mailgun:
             raise MailGunException(FAILED_LOAD_DOMAIN)
         if cls.MAILGUN_API_KEY is None:
             raise MailGunException(FAILED_LOAD_API_KEY)
+        if cls.FROM_EMAIL is None:
+            raise MailGunException(FAILED_LOAD_FROM_EMAIL)
         response = post(
             f"https://api.mailgun.net/v3/{cls.MAILGUN_DOMAIN}/messages",
             auth = ("api", cls.MAILGUN_API_KEY),
@@ -30,8 +33,7 @@ class Mailgun:
                 "from": f"{cls.FROM_TITLE} <{cls.FROM_EMAIL}>",
                 "to": email,
                 "subject": subject,
-                "text": text,
-                "html": html
+                "text": text
             }
         )    
         if response.status_code != 200:
