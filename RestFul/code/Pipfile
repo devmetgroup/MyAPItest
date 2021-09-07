@@ -11,6 +11,7 @@ Flask-SQLAlchemy = "*"
 Flask-RESTful = "*"
 marshmallow = "*"
 flask-jwt-extended = "*"
+requests = "*"
 
 [dev-packages]
 pylint = "*"
