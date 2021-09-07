@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
@@ -17,10 +18,10 @@ from resources.store import Store, StoreList
 from blacklist import BLACKLIST
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URI")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
-app.config['JWT_SECRET_KEY'] = 'jose'
+app.config['JWT_SECRET_KEY'] = os.environ.get("APP_SECRET_KEY")
 api = Api(app)
 
 @app.errorhandler(ValidationError)

@@ -12,6 +12,7 @@ Flask-RESTful = "*"
 marshmallow = "*"
 flask-jwt-extended = "*"
 requests = "*"
+python-dotenv = "*"
 
 [dev-packages]
 pylint = "*"
