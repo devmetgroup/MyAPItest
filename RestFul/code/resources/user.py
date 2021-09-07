@@ -11,6 +11,7 @@ from flask_jwt_extended import (
     get_jwt
 )
 from models.user import UserModel
+from models.confirmation import ConfirmationModel
 from schemas.user import UserSchema
 from libs.mailgun import MailGunException
 from blacklist import BLACKLIST
@@ -40,6 +41,8 @@ class UserRegister(Resource):
             return {"message": EMAIL_ALREADY_EXISTS.format(user.email)}, 400
         try:
             user.save_to_db()
+            confirmation = ConfirmationModel(user.id)
+            confirmation.save_to_db()
             user.send_confirmation_email()
             return {"message": USER_CREATED}, 201
         except MailGunException as e:
@@ -47,6 +50,7 @@ class UserRegister(Resource):
             return {"message": str(e)}, 500
         except:
             traceback.print_exc()
+            user.delete_from_db()
             return {"message": FAILED_TO_CREATE}, 500
 
 
@@ -74,7 +78,8 @@ class UserLogin(Resource):
         user_data = user_schema.load(user_json, partial=("email",))
         user = UserModel.find_by_username(user_data.username)
         if user and safe_str_cmp(user.password, user_data.password):
-            if user.activated:
+            confirmation = user.most_recent_confirmation
+            if confirmation and confirmation.confirmed:
                 access_token = create_access_token(identity=user.id, fresh=True)
                 refresh_token = create_refresh_token(user.id)
                 return {
@@ -100,13 +105,3 @@ class TokenRefresh(Resource):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
         return {'access_token': new_token}, 200
-    
-class UserConfirm(Resource):
-    @classmethod
-    def get(cls, user_id: int):
-        user = UserModel.find_by_id(user_id)
-        if not user:
-            return {"message": USER_NOT_FOUND}, 404
-        user.activated = True
-        user.save_to_db()
-        return {"message": USER_CONFIRMED}, 200
