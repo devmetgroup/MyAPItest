@@ -34,5 +34,13 @@
     "user_failed_to_create": "Internal server error, failed to create user.",
 
     "image_uploaded": "Image {} uploaded.",
-    "image_illegal_extension": "Extension {} is not allowed."
+    "image_illegal_extension": "Extension {} is not allowed.",
+    "image_illegal_file_name": "Illegal filename '{}' requested",
+    "image_not_found": "Image '{}' not found.",
+    "image_deleted": "Image '{}' deleted.",
+    "image_deleted_failed": "Internal server error! Failed to delete image.",
+
+    "avatar_not_found": "Avatar not found",
+    "avatar_delete_failed": "Internal server error! Failed to delete image.",
+    "avatar_uploaded": "Avatar {} uploaded."
 }
