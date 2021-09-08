@@ -14,21 +14,11 @@ from models.user import UserModel
 from models.confirmation import ConfirmationModel
 from schemas.user import UserSchema
 from libs.mailgun import MailGunException
+from libs.strings import gettext
 from blacklist import BLACKLIST
 
-NAME_ALREADY_EXISTS = "An user with name '{}' already exists."
-EMAIL_ALREADY_EXISTS = "An user with email '{}' already exists."
-ERROR_INSERTING = "An error ocurred while inserting the user."
-USER_NOT_FOUND = "User not found."
-USER_DELETED = "User deleted."
-USER_CREATED = "User created succesfully, an email with an activation link has been sent to your email address, please check."
-BAD_CREDENTIALS = "Invalid credentials."
-SUCESSFULLY_LOGOUT = "User <id={}> Succesfully logged out."
-NOT_CONFIRMED_ERROR = "You have not confirmed registration, please check your email <{}>"
-USER_CONFIRMED = "User confirmed."
-FAILED_TO_CREATE = "Internal server error, failed to create user."
-
 user_schema = UserSchema()
+
 
 class UserRegister(Resource):
     @classmethod
@@ -36,22 +26,22 @@ class UserRegister(Resource):
         user_json = request.get_json()
         user = user_schema.load(user_json)
         if UserModel.find_by_username(user.username):
-            return {"message": NAME_ALREADY_EXISTS.format(user.username)}, 400
+            return {"message": gettext("user_name_already_exists").format(user.username)}, 400
         if UserModel.find_by_email(user.email):
-            return {"message": EMAIL_ALREADY_EXISTS.format(user.email)}, 400
+            return {"message": gettext("user_email_already_exists").format(user.email)}, 400
         try:
             user.save_to_db()
             confirmation = ConfirmationModel(user.id)
             confirmation.save_to_db()
             user.send_confirmation_email()
-            return {"message": USER_CREATED}, 201
+            return {"message": gettext("user_created")}, 201
         except MailGunException as e:
             user.delete_from_db()
             return {"message": str(e)}, 500
         except:
             traceback.print_exc()
             user.delete_from_db()
-            return {"message": FAILED_TO_CREATE}, 500
+            return {"message": gettext("user_failed_to_create")}, 500
 
 
 class User(Resource):
@@ -59,16 +49,16 @@ class User(Resource):
     def get(cls, user_id):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {'message': USER_NOT_FOUND}, 404
+            return {'message': gettext("user_not_found")}, 404
         return user_schema.dump(user)
     
     @classmethod
     def delete(cls, user_id):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {'message': USER_NOT_FOUND}, 404
+            return {'message': gettext("user_not_found")}, 404
         user.delete_from_db()
-        return {'message': USER_DELETED}, 200
+        return {'message': gettext("user_deleted")}, 200
 
 
 class UserLogin(Resource):
@@ -86,8 +76,9 @@ class UserLogin(Resource):
                     'access_token': access_token,
                     'refresh_token': refresh_token
                 }, 200
-            return {"message": NOT_CONFIRMED_ERROR.format(user.username)}, 400
-        return {'message': BAD_CREDENTIALS}, 401
+            return {"message": gettext("user_not_confirmed_error").format(user.username)}, 400
+        return {'message': gettext("user_bad_credentials")}, 401
+
 
 class UserLogout(Resource):
     @classmethod
@@ -96,7 +87,8 @@ class UserLogout(Resource):
         jti = get_jwt()['jti']
         user_id = get_jwt_identity()
         BLACKLIST.add(jti)
-        return {'message': SUCESSFULLY_LOGOUT.format(user_id)}, 200
+        return {'message': gettext("user_succesfully_logged_out").format(user_id)}, 200
+
 
 class TokenRefresh(Resource):
     @classmethod
