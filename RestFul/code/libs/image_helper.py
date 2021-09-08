@@ -4,21 +4,21 @@ from typing import Union
 from werkzeug.datastructures import FileStorage
 from flask_uploads import UploadSet, IMAGES
 
-IMAGES_SET = UploadSet("images", IMAGES)
+IMAGE_SET = UploadSet("images", IMAGES)
 
 def save_image(image: FileStorage, folder: str = None, name = None) -> str:
     """Takes FileStorage and saves it to a folder"""
-    return IMAGES_SET.save(image, folder, name)
+    return IMAGE_SET.save(image, folder, name)
 
 def get_path(filename: str = None, folder: str = None) -> str:
     """Takes image name and folder and return full path"""
-    return IMAGES_SET.path(filename, folder)
+    return IMAGE_SET.path(filename, folder)
 
 def find_image_any_format(filename: str, folder: str) -> Union[str, None]:
     """Takes a filename and returns an image on any of the accepted formats"""
     for _format in IMAGES:
         image = f"{filename}.{_format}"
-        image_path = IMAGES_SET.path(filename=image, folder=folder)
+        image_path = IMAGE_SET.path(filename=image, folder=folder)
         if os.path.isfile(image_path):
             return image_path
     return None
