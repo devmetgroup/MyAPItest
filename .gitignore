@@ -1,5 +1,5 @@
-RestFul/code/.vscode
-Restful/code/static/images/
+images/
+avatars/
 __pycache__/
 *.db
 .env
