@@ -21,8 +21,6 @@ class Mailgun:
             raise MailGunException(gettext("mailgun_failed_load_domain"))
         if cls.MAILGUN_API_KEY is None:
             raise MailGunException(gettext("mailgun_failed_load_api_key"))
-        if cls.FROM_EMAIL is None:
-            raise MailGunException(gettext("mailgun_failed_load_from_email"))
         response = post(
             f"https://api.mailgun.net/v3/{cls.MAILGUN_DOMAIN}/messages",
             auth = ("api", cls.MAILGUN_API_KEY),
