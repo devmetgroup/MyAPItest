@@ -27,10 +27,11 @@ class Mailgun:
             f"https://api.mailgun.net/v3/{cls.MAILGUN_DOMAIN}/messages",
             auth = ("api", cls.MAILGUN_API_KEY),
             data = {
-                "from": f"{cls.FROM_TITLE} <{cls.FROM_EMAIL}>",
+                "from": f"{cls.FROM_TITLE} <postmaster@{cls.MAILGUN_DOMAIN}>",
                 "to": email,
                 "subject": subject,
-                "text": text
+                "text": text,
+                "html": html
             }
         )    
         if response.status_code != 200:
