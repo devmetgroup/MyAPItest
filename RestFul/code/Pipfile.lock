@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e93cfd22cf23c66189725dd6363c8eead1f418b098098a1550bd483092c5ff82"
+            "sha256": "9cf2edc7a3794aa5ea88d9210edca2a9dddb0fdd41416fd559a7221cc55eba5f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -78,6 +78,14 @@
             "index": "pypi",
             "version": "==0.3.9"
         },
+        "flask-reuploaded": {
+            "hashes": [
+                "sha256:07213bf46b011f7dfe2da64cf0dc85a5117ee31e64fd7528cc22cc0b00250515",
+                "sha256:ad48e9c46b23725a10c0e5afa06ba30f95549c1513083475dd01fffce71cb042"
+            ],
+            "index": "pypi",
+            "version": "==1.1.0"
+        },
         "flask-sqlalchemy": {
             "hashes": [
                 "sha256:2bda44b43e7cacb15d4e05ff3cc1f8bc97936cc464623424102bfc2c35e95912",
@@ -85,13 +93,6 @@
             ],
             "index": "pypi",
             "version": "==2.5.1"
-        },
-        "flask-uploads": {
-            "hashes": [
-                "sha256:53ecbd6033667d50ae02b63adebbaa33c7fc56c09e5293025810cf9d841ecb02"
-            ],
-            "index": "pypi",
-            "version": "==0.2.1"
         },
         "greenlet": {
             "hashes": [
