@@ -1,4 +1,5 @@
 RestFul/code/.vscode
+Restful/code/static/images/
 __pycache__/
 *.db
 .env
