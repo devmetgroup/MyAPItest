@@ -13,7 +13,6 @@ class Mailgun:
     MAILGUN_DOMAIN = os.environ.get("MAILGUN_DOMAIN")
     MAILGUN_API_KEY = os.environ.get("MAILGUN_API_KEY")
     FROM_TITLE = "Stores REST API"
-    FROM_EMAIL = os.environ.get("FROM_EMAIL")
     
     @classmethod    
     def send_email(cls, email: List[str], subject: str, text: str, html: str) -> Response:
