@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_uploads import configure_uploads
+from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from marshmallow import ValidationError
 from db import db
@@ -19,17 +20,17 @@ load_dotenv(".env", verbose=True)
 app.config.from_object("default_config")
 app.config.from_envvar("APPLICATION_SETTINGS")
 configure_uploads(app, IMAGE_SET)
-api = Api(app)
+
+with app.app_context():
+    api = Api(app)
+    jwt = JWTManager(app)
+    db.init_app(app)
+    ma.init_app(app)
+    migrate = Migrate(app,db)
 
 @app.errorhandler(ValidationError)
 def handle_marshmallow_validation(err):
     return jsonify(err.messages), 400
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
-    
-jwt = JWTManager(app)
 
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_data):
@@ -52,6 +53,4 @@ api.add_resource(AvatarUpload, '/upload/avatar')
 api.add_resource(Avatar, '/avatar/<int:user_id>')
 
 if __name__ == "__main__":
-    db.init_app(app)
-    ma.init_app(app)
     app.run(port=5000)
