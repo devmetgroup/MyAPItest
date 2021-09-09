@@ -14,6 +14,7 @@ flask-jwt-extended = "*"
 requests = "*"
 python-dotenv = "*"
 flask-reuploaded = "*"
+flask-migrate = "*"
 
 [dev-packages]
 pylint = "*"
